@@ -2,12 +2,15 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 /**
- * Protege as rotas do painel.
- *  - Sem sessão tentando acessar o painel  -> redireciona p/ /login
- *  - Com sessão tentando acessar login/cadastro -> redireciona p/ /dashboard
- * Também renova os cookies de sessão do Supabase a cada request.
+ * Proxy (antigo `middleware` — renomeado no Next 16). Protege as rotas do
+ * painel e renova a sessão do Supabase a cada request.
+ *  - Sem sessão fora das telas de auth -> /login
+ *  - Com sessão nas telas de auth       -> /dashboard
+ * As rotas /api tratam a própria autenticação (não redirecionam aqui).
+ * /admin fica protegido por ser rota comum (exige sessão); o e-mail é
+ * conferido no route handler /api/admin (ADMIN_EMAILS).
  */
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
 
   const supabase = createServerClient(
@@ -19,9 +22,7 @@ export async function middleware(request: NextRequest) {
           return request.cookies.getAll();
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value)
-          );
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
           response = NextResponse.next({ request });
           cookiesToSet.forEach(({ name, value, options }) =>
             response.cookies.set(name, value, options)
@@ -31,7 +32,6 @@ export async function middleware(request: NextRequest) {
     }
   );
 
-  // IMPORTANTE: getUser() revalida o token no servidor (não confie só no cookie).
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -55,9 +55,9 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  // Roda em tudo, exceto assets estáticos, imagens e os webhooks
-  // (que são públicos e autenticados por assinatura HMAC, não por sessão).
+  // Roda em tudo, exceto assets estáticos, ícones e as rotas /api
+  // (que autenticam sozinhas).
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|api/webhooks|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|icon.svg|apple-icon|manifest.json|api|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };

@@ -1,0 +1,12 @@
+{
+  "name": "Casal do Açaí",
+  "short_name": "Casal do Açaí",
+  "description": "A calculadora de custo e preço do seu copo de açaí.",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "background_color": "#FFF9F2",
+  "theme_color": "#65037E",
+  "icons": [
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}
