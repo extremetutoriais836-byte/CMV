@@ -94,6 +94,25 @@ Os `.sql` na raiz são migrações idempotentes:
     (`restaurante_id = auth.uid()` OU membros) em todas as tabelas. **NÃO quebra contas 1-loja.**
 15. `schema_gestor.sql` — `gestores_locus` + RPC `carteira_gestor` (visão interna de carteira).
 
+#### Versão Casal do Açaí (app atual — rodar depois das anteriores)
+
+16. `schema_entrega.sql` — em `restaurantes`: `modelo_entrega` ('propria'|'plataforma'),
+    `taxa_plataforma` (padrão 30), `meta_lucro` (padrão 4,00), `bloqueado`, `email`.
+    Substitui o `TAXA_IFOOD_PADRAO` fixo — a taxa passa a ser **por restaurante**.
+17. `schema_config.sql` — tabela `config_app` (chave-valor jsonb): `tutorial_videos`,
+    `faixas_cmv`, `taxas_entrega`, `meta_lucro_padrao`. RLS: **leitura pública**,
+    escrita só via service role (painel `/admin`) — permite trocar sem redeploy.
+18. `seed_acaiteria.sql` — kit de açaiteria em `templates_ficha`. **Atenção:** usa o
+    schema REAL (`nicho, nome_prato_modelo, insumos`), não a coluna `payload`.
+19. `schema_bloqueio.sql` — estende `protege_colunas_assinatura` para também blindar
+    `bloqueado` e `email` (sem isso, o usuário se desbloqueava sozinho pela anon key)
+    e fixa `search_path`. **Rodar sempre depois do `schema_entrega.sql`.**
+
+> O app atual (Casal do Açaí) usa apenas: `restaurantes`, `insumos`, `fichas_tecnicas`,
+> `ingredientes_ficha`, `custos_fixos`, `vw_cmv_ficha`, `config_app` e `templates_ficha`.
+> As tabelas de iFood/pedidos/assinatura seguem no banco (nada foi apagado), mas não
+> têm UI — o caminho de volta continua curto.
+
 ### Modelo de dados (resumo)
 
 - `restaurantes` — "perfil" do dono. **`id = auth.uid()`** (1 usuário = 1 restaurante).

@@ -1,0 +1,114 @@
+@import "tailwindcss";
+
+/* =====================================================================
+   Marca Casal do Açaí — tokens centralizados (NUNCA hardcode cor em
+   componente; sempre via estes tokens, para trocar a marca num só lugar).
+
+   Contraste auditado:
+     Roxo  #65037E sobre branco ... 11,24:1  (AA)
+     Roxo  #8A0BAA sobre branco ...  7,75:1  (AA)
+     Ink   #2A1F2E sobre branco ... 15,74:1  (AA)
+     Amarelo #FDCA01 sobre branco .. 1,54:1  (REPROVA)
+   Regra fixa: o amarelo #FDCA01 NUNCA é cor de texto sobre fundo claro.
+   Só preenchimento (com texto escuro por cima) ou texto sobre roxo.
+   Para texto âmbar em fundo claro, use --color-accent-ink (#7A5F00).
+   ===================================================================== */
+@theme {
+  --color-brand:       #65037E; /* roxo oficial do logo */
+  --color-brand-vivid: #8A0BAA; /* roxo-vivo p/ hover/realce (passa AA) */
+  --color-brand-light: #B85BE0; /* links/texto pequeno sobre superfície escura */
+  --color-brand-deep:  #3F034E; /* títulos, cabeçalhos de tabela */
+
+  --color-accent:      #FDCA01; /* amarelo do logo — SÓ preenchimento */
+  --color-accent-ink:  #7A5F00; /* âmbar legível quando precisar de texto amarelo */
+
+  --color-ink:         #2A1F2E; /* texto principal */
+  --color-muted:       #6B5B6E; /* texto secundário */
+  --color-surface:     #FFF9F2; /* creme de fundo, igual ao ebook */
+  --color-card:        #FFFFFF;
+  --color-line:        #EFE3EA; /* bordas suaves */
+
+  /* Emerald reservado a lucro/sucesso. Loss/amber p/ faixas de CMV. */
+  --color-profit:      #059669;
+  --color-profit-soft: #ECFDF5;
+  --color-loss:        #DC2626;
+  --color-loss-soft:   #FEF2F2;
+  --color-warn:        #D97706;
+  --color-warn-soft:   #FFFBEB;
+
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+html {
+  color-scheme: light;
+}
+
+body {
+  background: var(--color-surface);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Superfície dark de marca (auth, badges iFood no legado) — brilho radial. */
+.brand-glow {
+  background:
+    radial-gradient(1200px 600px at 50% -10%, rgba(184, 91, 224, 0.28), transparent 60%),
+    linear-gradient(180deg, #1c0524 0%, #2a0733 100%);
+}
+
+/* Barra de rolagem discreta */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-line) transparent;
+}
+
+/* ---- Animações do onboarding (SVG + @keyframes, sem lib) ---- */
+@keyframes ob-fill {
+  0%, 15% { transform: scaleY(0); }
+  55%, 80% { transform: scaleY(1); }
+  100% { transform: scaleY(0); }
+}
+@keyframes ob-pop {
+  0%, 100% { opacity: 0; transform: translateY(6px) scale(0.9); }
+  50% { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes ob-grow {
+  0%, 100% { transform: scaleY(0.35); opacity: 0.55; }
+  50% { transform: scaleY(1); opacity: 1; }
+}
+@keyframes ob-toggle {
+  0%, 45% { transform: translateX(0); }
+  55%, 100% { transform: translateX(22px); }
+}
+@keyframes ob-bar {
+  0% { width: 8%; }
+  100% { width: 76%; }
+}
+@keyframes ob-fade {
+  0%, 45% { opacity: 1; }
+  55%, 100% { opacity: 0; }
+}
+@keyframes ob-fade-in {
+  0%, 45% { opacity: 0; }
+  55%, 100% { opacity: 1; }
+}
+.ob-fill { transform-origin: bottom; animation: ob-fill 4s ease-in-out infinite; }
+.ob-pop-1 { animation: ob-pop 3s ease-in-out infinite; }
+.ob-pop-2 { animation: ob-pop 3s ease-in-out 1s infinite; }
+.ob-pop-3 { animation: ob-pop 3s ease-in-out 2s infinite; }
+.ob-grow { transform-origin: bottom; animation: ob-grow 2.6s ease-in-out infinite; }
+.ob-toggle { animation: ob-toggle 2.4s ease-in-out infinite alternate; }
+.ob-bar { animation: ob-bar 2.6s ease-in-out infinite alternate; }
+.ob-fade { animation: ob-fade 2.4s ease-in-out infinite alternate; }
+.ob-fade-in { animation: ob-fade-in 2.4s ease-in-out infinite alternate; }
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
